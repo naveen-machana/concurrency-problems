@@ -4,10 +4,9 @@ public class ReadWriteLock {
     private int readers;
     private boolean writeLocked;
 
-    public synchronized void acquireReadLock() {
-        while (writeLocked) { try{ wait(); } catch(InterruptedException e) {} }
+    public synchronized void acquireReadLock() throws InterruptedException {
+        while (writeLocked) wait();
         readers++;
-        notifyAll();
     }
 
     public synchronized void releaseReadLock() {
@@ -15,8 +14,8 @@ public class ReadWriteLock {
         notifyAll();
     }
 
-    public synchronized void acquireWriteLock() {
-        while (writeLocked || readers != 0) { try { wait(); } catch (InterruptedException e) {}}
+    public synchronized void acquireWriteLock() throws InterruptedException {
+        while (writeLocked || readers != 0) wait();
         writeLocked = true;
     }
 
