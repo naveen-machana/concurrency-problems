@@ -4,31 +4,26 @@ import java.util.concurrent.TimeUnit;
 
 public class RateLimiterWithBackgroundThread {
     private interface RateLimiter {
-        public void getToken();
+        public void getToken() throws InterruptedException;
     }
 
     private static class RateLimiterImpl implements RateLimiter {
         private final int MAX_TOKENS;
         private int available;
         private Thread tokenFiller;
-        public RateLimiterImpl(int maxTokens) { this.MAX_TOKENS = maxTokens; }
-        public synchronized void getToken() {
-            while (available == 0) waitForTokens();
+        public RateLimiterImpl(int maxTokens) { this.MAX_TOKENS = maxTokens; this.available = MAX_TOKENS; }
+        public synchronized void getToken() throws InterruptedException {
+            while (available == 0) wait();
             available--;
             System.out.println("Token issued to "  + Thread.currentThread().getName());
-        }
-
-        private void waitForTokens() {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {}
         }
 
         private synchronized void fillToken() {
 
             while(true) {
                 synchronized (this) {
-                    if (available < MAX_TOKENS) available = MAX_TOKENS;
+                    available++;
+                    if (available > MAX_TOKENS) available = MAX_TOKENS;
                     this.notifyAll();
                 }
                 try {
@@ -52,7 +47,7 @@ public class RateLimiterWithBackgroundThread {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         RateLimiter limiter = TokenBucketFactory.getRateLimiter();
         limiter.getToken();
     }
