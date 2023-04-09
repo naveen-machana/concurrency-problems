@@ -35,7 +35,7 @@ public class BarberShop {
                 lock.lock();
                 while (!isBarberChairAvailable) barber.await();
                 isBarberChairAvailable = false;
-                customers.notifyAll();
+                customers.notify();
                 lock.unlock();
             } finally {
                 waitingChairs.release();
