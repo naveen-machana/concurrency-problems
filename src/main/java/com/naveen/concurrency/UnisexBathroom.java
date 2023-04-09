@@ -3,7 +3,7 @@ package com.naveen.concurrency;
 import java.util.concurrent.TimeUnit;
 
 public class UnisexBathroom {
-    private static enum UsedBy { MEN, WOMEN, NONE };
+    private enum UsedBy { MEN, WOMEN, NONE };
     Semaphore maxAllowed = new Semaphore(3);
     UsedBy usedBy = UsedBy.NONE;
     int empsInBathroom;
