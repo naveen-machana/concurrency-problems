@@ -1,4 +1,4 @@
-package com.naveen.concurrency;
+package com.naveen.concurrency.h2omolecule;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
