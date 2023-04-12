@@ -20,6 +20,7 @@ public class BarberShop {
     private Lock lock;
     private Condition customers;
     private Condition barber;
+    private Semaphore hairCutDone;
 
     public BarberShop(int waitingChairs) {
         this.waitingChairs = new Semaphore(waitingChairs);
@@ -27,6 +28,7 @@ public class BarberShop {
         this.lock = new ReentrantLock();
         this.customers = this.lock.newCondition();
         barber = this.lock.newCondition();
+        hairCutDone = new Semaphore(0);
     }
 
     public void customer() throws InterruptedException {
@@ -37,6 +39,7 @@ public class BarberShop {
                 isBarberChairAvailable = false;
                 customers.notify();
                 lock.unlock();
+                hairCutDone.acquire();
             } finally {
                 waitingChairs.release();
             }
@@ -54,6 +57,7 @@ public class BarberShop {
             groomhair();
             isBarberChairAvailable = true;
             barber.notifyAll();
+            hairCutDone.release();
             lock.unlock();
         }
     }
